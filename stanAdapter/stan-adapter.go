@@ -1,4 +1,4 @@
-package stan
+package stanAdapter
 
 import (
 	"fmt"

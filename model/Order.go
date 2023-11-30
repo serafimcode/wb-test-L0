@@ -1,6 +1,6 @@
 package model
 
 type Order struct {
-	ID   string                 `gorm:"primaryKey" json:"id"`
-	Info map[string]interface{} `gorm:"type:json" json:"info"`
+	ID   string `gorm:"primaryKey" json:"id"`
+	Info []byte `gorm:"type:json" json:"info"`
 }
