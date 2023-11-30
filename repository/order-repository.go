@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"github.com/serafimcode/wb-test-L0/model"
 	"gorm.io/gorm"
+
+	"github.com/serafimcode/wb-test-L0/model"
 )
 
 type OrderRepository struct {

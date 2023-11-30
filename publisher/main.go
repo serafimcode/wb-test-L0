@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	env "github.com/joho/godotenv"
-	stanAdapter "github.com/serafimcode/wb-test-L0/stanAdapter"
+	stanAdapter "github.com/serafimcode/wb-test-L0/stanClient"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	defer connection.Close()
 
 	orderBuffer := loadRawJson("publisher/model.json")
-	channelName := os.Getenv("NATS_CHANNEL")
+	channelName := os.Getenv("NATS_ORDERS_CHANNEL")
 	err = connection.Publish(channelName, orderBuffer)
 	if err != nil {
 		log.Fatal(err)
