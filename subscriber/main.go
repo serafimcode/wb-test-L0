@@ -1,14 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"time"
 
 	env "github.com/joho/godotenv"
+	"gorm.io/gorm"
 
-	"github.com/serafimcode/wb-test-L0/dbAdapter"
-	"github.com/serafimcode/wb-test-L0/stanClient"
+	"github.com/serafimcode/wb-test-L0/api"
+	"github.com/serafimcode/wb-test-L0/dbadapter"
+	"github.com/serafimcode/wb-test-L0/memorycache"
+	"github.com/serafimcode/wb-test-L0/model"
+	"github.com/serafimcode/wb-test-L0/stanclient"
 )
 
 func main() {
@@ -16,13 +19,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dbAdapter.InitDb()
+	dbadapter.InitDb()
 
-	stanService := stanClient.InitStan()
+	cache := memorycache.New(5*time.Minute, 10*time.Minute)
+
+	populateCache(dbadapter.GetDb(), cache)
+
+	stanService := stanclient.InitStan()
 	defer stanService.Connection.Close()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, you've requested: %s\n", r.URL.Path)
-	})
-	http.ListenAndServe(":8080", nil)
+	api.InitServer(cache)
+}
+
+func populateCache(db *gorm.DB, cache *memorycache.Cache) {
+	var orders []model.Order
+	db.Where("created_at >= ? ", time.Now().Add(-time.Hour)).Find(&orders)
+
+	for _, order := range orders {
+		cache.Set(order.ID, order.Info, 0)
+	}
+
+	cache.Log()
 }

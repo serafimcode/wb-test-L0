@@ -1,4 +1,4 @@
-package stanClient
+package stanclient
 
 import (
 	"fmt"

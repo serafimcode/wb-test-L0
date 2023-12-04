@@ -1,4 +1,4 @@
-package dbAdapter
+package dbadapter
 
 import (
 	"fmt"

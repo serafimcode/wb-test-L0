@@ -1,15 +1,14 @@
-package stanClient
+package stanclient
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/serafimcode/wb-test-L0/dbAdapter"
 	"log"
 	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/nats-io/stan.go"
 
+	"github.com/serafimcode/wb-test-L0/dbadapter"
 	"github.com/serafimcode/wb-test-L0/model"
 	"github.com/serafimcode/wb-test-L0/repository"
 )
@@ -39,8 +38,6 @@ func InitStan() *StanService {
 }
 
 func ordersSubscribeHandler(msg *stan.Msg) {
-	fmt.Println("Subscriber received message")
-
 	orderInfo, err := validateOrderInfoDTO(msg.Data)
 	if err != nil {
 		log.Println("JSON validation error:", err)
@@ -48,17 +45,16 @@ func ordersSubscribeHandler(msg *stan.Msg) {
 	}
 
 	orderId := orderInfo.OrderUID
-	orderInfoRaw, err := json.Marshal(orderInfo)
-	var orderInfoJson map[string]interface{}
-	err = json.Unmarshal(orderInfoRaw, &orderInfoJson)
+	jsonInfo, err := json.Marshal(orderInfo)
+
 	if err != nil {
 		log.Println("JSON unmarshal error:", err)
 		return
 	}
 
-	order := model.Order{ID: orderId, Info: orderInfoJson}
-	orderRepository := repository.OrderRepository{Db: dbAdapter.GetDb()}
-	orderRepository.Create(order)
+	order := model.Order{ID: orderId, Info: jsonInfo}
+	orderRepository := repository.OrderRepository{Db: dbadapter.GetDb()}
+	orderRepository.Create(&order)
 }
 
 func validateOrderInfoDTO(data []byte) (*model.OrderInfoDTO, error) {
@@ -68,9 +64,11 @@ func validateOrderInfoDTO(data []byte) (*model.OrderInfoDTO, error) {
 	if err := json.Unmarshal(data, &orderInfo); err != nil {
 		return nil, err
 	}
+
 	err := validate.Struct(orderInfo)
 	if err != nil {
 		return nil, err
 	}
+
 	return &orderInfo, nil
 }

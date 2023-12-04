@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	env "github.com/joho/godotenv"
-	stanAdapter "github.com/serafimcode/wb-test-L0/stanClient"
+	stanAdapter "github.com/serafimcode/wb-test-L0/stanclient"
 )
 
 func main() {
