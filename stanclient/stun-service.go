@@ -29,7 +29,7 @@ func InitStan() *StanService {
 	stanService.Connection = connection
 
 	channelName := os.Getenv("NATS_ORDERS_CHANNEL")
-	_, err = connection.Subscribe(channelName, ordersSubscribeHandler)
+	_, err = connection.Subscribe(channelName, ordersSubscribeHandler, stan.DurableName("orders-durable"))
 
 	if err != nil {
 		log.Fatal(err)
